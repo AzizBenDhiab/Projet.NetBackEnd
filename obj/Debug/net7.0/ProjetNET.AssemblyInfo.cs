@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjetNET")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+869511fa9f191ec7787ee7949d0d62d6a4147944")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjetNET")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjetNET")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
