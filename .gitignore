@@ -1,0 +1,15 @@
+# Ignore generated files
+bin/
+obj/
+*.suo
+*.user
+*.suo
+*.user
+*.bak
+*.tmp
+*.log
+*.vscode/
+.vs/
+*.sln.cache
+*.dbmdl
+*.jfm
