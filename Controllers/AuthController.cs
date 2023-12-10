@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ProjetNET.Controllers
 {
-    [Route("api/[Controller]")]
+    [Route("[Controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
