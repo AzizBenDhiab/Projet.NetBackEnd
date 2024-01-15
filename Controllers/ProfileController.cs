@@ -108,7 +108,50 @@ namespace ProjetNET.Controllers
             return Ok("blame deleted successfully");
         }
 
+        //Medal
 
+
+        [HttpGet("/Profile/Medals")]
+        public ActionResult<object> GetUserMedals(Guid userId)
+        {
+            var userMedals = _db.Medals.Where(w => w.UserId.Equals(userId)).ToList();
+            return Ok(userMedals);
+        }
+
+        [HttpPost("/Profile/Medals")]
+        public ActionResult<object> AddUserMedal(Guid userId, string type, string name, string description, DateTime date)
+        {
+            var newMedal = new Medal
+            {
+                UserId = userId,
+                Type = type,
+                Name = name,
+                Description = description,
+                Date = date
+
+            };
+
+            _db.Medals.Add(newMedal);
+            _db.SaveChanges();
+
+            return Ok("medal added successfully");
+        }
+
+        [HttpDelete("/Profile/Medals")]
+
+        public ActionResult<object> DeleteMedal (Guid MedalId)
+        {
+            var MedalToDelete = _db.Medals.Find(MedalId);
+
+            if (MedalToDelete != null)
+            {
+                _db.Medals.Remove(MedalToDelete);
+                _db.SaveChanges();
+            }
+
+
+            return Ok("medal deleted successfully");
+        }
 
     }
 }
