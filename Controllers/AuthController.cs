@@ -127,6 +127,7 @@ namespace ProjetNET.Controllers
                 return false;
             }
         }
+        [HttpPost]
         public string GenerateTokenString(User user)
         {
             var claims = new List<Claim>

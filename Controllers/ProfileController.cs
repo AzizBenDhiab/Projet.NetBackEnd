@@ -6,6 +6,8 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ProjetNET.Controllers
 {
@@ -63,6 +65,47 @@ namespace ProjetNET.Controllers
             };
 
             return Ok(profileData);
+        }
+
+        [HttpGet]
+        public ActionResult<object> GetUserWarnings(Guid userId)
+        {
+            var userBlames = _db.Blames.Where(w => w.UserId.Equals( userId)).ToList();
+            return Ok(userBlames) ;
+        }
+
+        [HttpPost]
+        public ActionResult<object> AddUserBlame(Guid userId, string objet, string name, string contention)
+        {
+            var newBlame = new Blame
+            {
+                UserId = userId,
+                Object = objet,
+                Name=name,
+                Contention=contention,
+           
+            };
+
+            _db.Blames.Add(newBlame);
+            _db.SaveChanges();
+
+            return Ok("blame added successfully");
+        }
+
+        [HttpDelete]
+
+        public ActionResult<object> DeleteBlame(Guid BlameId)
+        {
+            var BlameToDelete = _db.Blames.Find(BlameId);
+
+            if (BlameToDelete != null)
+            {
+                _db.Blames.Remove(BlameToDelete);
+                _db.SaveChanges();
+            }
+
+            
+            return Ok("blame deleted successfully");
         }
 
 
