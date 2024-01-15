@@ -115,6 +115,7 @@ namespace ProjetNET.Controllers
         }
 
         // Validate email format
+        [NonAction]
         private bool IsValidEmail(string email)
         {
             try
@@ -127,12 +128,13 @@ namespace ProjetNET.Controllers
                 return false;
             }
         }
+        [NonAction]
         public string GenerateTokenString(User user)
         {
             var claims = new List<Claim>
             {
-               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User"),
+              new Claim("id", user.Id.ToString()),
+                    new Claim("role", user.IsAdmin ? "Admin" : "User"),
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value));

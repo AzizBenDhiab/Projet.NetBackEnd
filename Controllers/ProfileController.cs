@@ -38,7 +38,7 @@ namespace ProjetNET.Controllers
         public ActionResult<object> GetUserAndHistorique()
         {
             // Get the user's ID from the claims in the JWT token
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = HttpContext.User.FindFirst("id");
             var jwtToken = HttpContext.Request.Headers["Authorization"];
 
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
