@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +11,8 @@ namespace ProjetNET.Models
 
         [ForeignKey(nameof(Meeting))]
         public Guid MeetingId { get; set; }
-        public bool Presence {  get; set; } 
+        public bool Presence {  get; set; }
+        public bool Confirmation { get; set; }
         public String? Cause { get; set; }
     }
 }
