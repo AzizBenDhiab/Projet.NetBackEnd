@@ -115,6 +115,7 @@ namespace ProjetNET.Controllers
         }
 
         // Validate email format
+        [NonAction]
         private bool IsValidEmail(string email)
         {
             try

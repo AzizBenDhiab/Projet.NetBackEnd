@@ -13,7 +13,7 @@ namespace ProjetNET.Controllers
 {
     [Route("api/Profile")]
     [ApiController]
-    [Authorize] 
+   // [Authorize] 
     public class ProfileController : ControllerBase
     {
 
@@ -111,14 +111,14 @@ namespace ProjetNET.Controllers
         //Medal
 
 
-        [HttpGet("/Profile/Medals")]
+        /*[HttpGet]
         public ActionResult<object> GetUserMedals(Guid userId)
         {
             var userMedals = _db.Medals.Where(w => w.UserId.Equals(userId)).ToList();
             return Ok(userMedals);
         }
 
-        [HttpPost("/Profile/Medals")]
+        [HttpPost]
         public ActionResult<object> AddUserMedal(Guid userId, string type, string name, string description, DateTime date)
         {
             var newMedal = new Medal
@@ -137,7 +137,7 @@ namespace ProjetNET.Controllers
             return Ok("medal added successfully");
         }
 
-        [HttpDelete("/Profile/Medals")]
+        [HttpDelete]
 
         public ActionResult<object> DeleteMedal (Guid MedalId)
         {
@@ -151,7 +151,7 @@ namespace ProjetNET.Controllers
 
 
             return Ok("medal deleted successfully");
-        }
+        }*/
 
     }
 }
