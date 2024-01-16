@@ -111,14 +111,14 @@ namespace ProjetNET.Controllers
         //Medal
 
 
-        /*[HttpGet]
+        [HttpGet("api/Profile/Medals")]
         public ActionResult<object> GetUserMedals(Guid userId)
         {
             var userMedals = _db.Medals.Where(w => w.UserId.Equals(userId)).ToList();
             return Ok(userMedals);
         }
 
-        [HttpPost]
+        [HttpPost("api/Profile/Medals")]
         public ActionResult<object> AddUserMedal(Guid userId, string type, string name, string description, DateTime date)
         {
             var newMedal = new Medal
@@ -137,7 +137,7 @@ namespace ProjetNET.Controllers
             return Ok("medal added successfully");
         }
 
-        [HttpDelete]
+        [HttpDelete("api/Profile/Medals")]
 
         public ActionResult<object> DeleteMedal (Guid MedalId)
         {
@@ -151,7 +151,7 @@ namespace ProjetNET.Controllers
 
 
             return Ok("medal deleted successfully");
-        }*/
+        }
 
     }
 }
