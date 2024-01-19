@@ -8,29 +8,33 @@ using ProjetNET.Controllers;
 public class DeadlineChecker : BackgroundService
 {
     private readonly IServiceProvider _services;
+    private readonly ILogger<DeadlineChecker> _logger;
 
-    public DeadlineChecker(IServiceProvider services)
+    public DeadlineChecker(IServiceProvider services, ILogger<DeadlineChecker> logger)
     {
         _services = services;
+        _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected async override System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (true)
         {
             using (var scope = _services.CreateScope())
             {
+                Console.WriteLine("check deadline");
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>(); // Replace YourDbContext with your actual DbContext
 
                 // Fetch and process entities with deadlines
-                var entitiesWithDeadlines = dbContext.Tasks.Where(e => e.DeadLine <= DateTime.Now && e.Status != "Terminé");
+                var entitiesWithDeadlines = dbContext.Tasks.Where(e => e.DeadLine <= DateTime.Now && e.Status != "Validé");
                 foreach (var entity in entitiesWithDeadlines)
                 {
                     entity.Status = "Terminé";
+                    dbContext.SaveChanges();
                 }
             }
-
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // 1 minute interval
+            await System.Threading.Tasks.Task.Delay(12000, stoppingToken);
         }
     }
+
 }

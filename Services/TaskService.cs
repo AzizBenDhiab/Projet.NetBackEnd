@@ -1,6 +1,6 @@
 ﻿using ProjetNET.Controllers;
 using ProjetNET.Models;
-
+  
 namespace ProjetNET.Services
 {
     public class TaskService
@@ -12,33 +12,61 @@ namespace ProjetNET.Services
         }
         public List<Models.Task> GetAllTasks()
         {
-            List<Models.Task> tasks = _db.Tasks.ToList();
+            List<Models.Task> tasks = _db.Tasks.OrderByDescending(obj => obj.DeadLine).ToList();
             return (tasks);
         }
-        public Models.Task CreateTask(TaskForm taskForm)
+        public List<Models.Task> GetInvalidTasks()
+        {
+            List<Models.Task> tasks = _db.Tasks.Where(obj => obj.Status != "Validé").OrderByDescending(obj => obj.DeadLine).ToList();
+            return (tasks);
+        }
+        public List<Models.Task> GetCurrentTasksByUserId(Guid userId)
+        {
+            var taskvalidations = _db.ValidationTasks.Where(c => c.UserId == userId);
+            List<Models.Task> tasks = new List<Models.Task>();
+            foreach (var taskvalidation in taskvalidations)
+            {
+                var task = _db.Tasks.FirstOrDefault(c => c.Id == taskvalidation.TaskId);
+                if (task!=null && task.Status=="En cours")
+                {
+                    tasks.Add(task);
+                }
+            }
+            return tasks;
+        }
+        public void CreateTask(TaskForm taskForm)
         {
             Models.Task task = new Models.Task()
             {
                 DeadLine = taskForm.DeadLine,
                 Description = taskForm.Description,
                 Name = taskForm.Name,
-                Status = "En cours",
-                Users = new List<Models.User>()
+                Status = "En cours"  
             };
-            foreach (var userId in taskForm.Users)
-            {
-                var User = _db.Users.FirstOrDefault(c => c.Id == userId);
-                if(User != null) {
-                    task.Users.Add(User);
-                } 
-            }
-            return task;
-        }
-        public void AddTask(Models.Task task)
-        {
             _db.Tasks.Add(task);
             _db.SaveChanges();
+            foreach (var userId in taskForm.Users)
+            {
+                 var user = _db.Users.FirstOrDefault(c=>c.Id==userId);
+                if (user!=null)
+                {
+                    var taskValidation = new Models.ValidationTask()
+                    {
+                        TaskId = task.Id,
+                        UserId = userId,
+                        Validation = false,
+                    };
+                    _db.ValidationTasks.Add(taskValidation);
+                }
+                
+                    
+                   
+                
+            }
+            _db.SaveChanges();
+
         }
+        
 
     }
 }

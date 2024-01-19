@@ -14,11 +14,12 @@ namespace ProjetNET.Controllers
         {
             _service= service;
         }
-        public void Index() { }
-        [HttpPost("create")]
-        public IActionResult CreateValidation([FromBody] ValidationTaskForm validationTaskForm) { 
-        _service.CreateValidation(validationTaskForm);
-            return (RedirectToAction("Index"));
+        
+        [HttpPost]
+        public IActionResult Validate([FromBody] ValidationTaskForm validationTaskForm) { 
+            if (validationTaskForm == null) { return BadRequest("formulaire vide"); }
+            _service.ValidateTask(validationTaskForm);
+            return Ok ();
         }
         
     }

@@ -14,17 +14,28 @@ namespace ProjetNET.Controllers
         {
             _service = service;
         }
-        [HttpGet("index")]
-        public object Index()
-        {
-            List<Models.Task> tasks = _service.GetAllTasks();
-            return (tasks);
-        }
+        
         [HttpPost("create")]
         public IActionResult Create([FromBody] TaskForm taskform) {
-            var task = _service.CreateTask(taskform);
-            _service.AddTask(task);
-            return(RedirectToAction("Index"));
+            if (taskform==null)
+            {
+                return BadRequest("form vide");
+            }
+            if(taskform.Users==null || taskform.Users.Count()==0 || taskform.Name == ""|| taskform.Description=="")
+            {
+                return BadRequest("champ(s) vide");
+            }
+           _service.CreateTask(taskform);
+            return Ok();
         }
+        [HttpGet]
+        public IActionResult GetTasks()
+
+        {
+            Console.WriteLine("getting all tasks ");
+            var tasks = _service.GetInvalidTasks();
+            return Ok(tasks);
+        }
+
     }
 }

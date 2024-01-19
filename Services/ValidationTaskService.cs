@@ -10,18 +10,17 @@ namespace ProjetNET.Services
         {
             _db = db;
         }
-        public void CreateValidation(ValidationTaskForm validationTaskForm) {
-        var  valid= validationTaskForm.Validation== "valide";
-            var validation = new ValidationTask()
+        public void ValidateTask(ValidationTaskForm validationTaskForm) {
+      
+            var validations = _db.ValidationTasks.Where(x => x.TaskId == validationTaskForm.TaskId);
+            foreach (var validationTask in validations)
             {
-                UserId = validationTaskForm.UserId,
-                TaskId = validationTaskForm.TaskId,
-                Validation = valid,
-                Cause = validationTaskForm.Cause,
-            };
-
-        _db.ValidationTasks.Add(validation);
-        _db.SaveChanges();
+                validationTask.Validation = true;
+            }
+            _db.SaveChanges();
+            var task=_db.Tasks.FirstOrDefault(x => x.Id == validationTaskForm.TaskId);
+            if (task != null) { task.Status = "Validé"; }
+            _db.SaveChanges();
 
         }
     }
