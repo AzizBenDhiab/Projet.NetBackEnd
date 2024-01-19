@@ -114,6 +114,51 @@ namespace ProjetNET.Controllers
             return Ok("Login successful");
         }
 
+        [HttpGet("{id:Guid}", Name = "GetUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<Event> GetUser(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest();
+            }
+
+            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+
+            if (e == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(e);
+        }
+
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+
+        [HttpDelete("{id:Guid}", Name = "Delete")]
+        public IActionResult Delete(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest();
+            }
+            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            if (e == null)
+            {
+                return NotFound();
+            }
+            _db.Users.Remove(e);
+            _db.SaveChanges();
+            return NoContent();
+        }
+
         // Validate email format
         [NonAction]
         private bool IsValidEmail(string email)
