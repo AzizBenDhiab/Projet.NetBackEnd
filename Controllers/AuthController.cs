@@ -115,6 +115,7 @@ namespace ProjetNET.Controllers
         }
 
         // Validate email format
+        [NonAction]
         private bool IsValidEmail(string email)
         {
             try
@@ -127,6 +128,7 @@ namespace ProjetNET.Controllers
                 return false;
             }
         }
+        [NonAction]
         public string GenerateTokenString(User user)
         {
             var claims = new List<Claim>
