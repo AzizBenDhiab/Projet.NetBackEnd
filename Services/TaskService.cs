@@ -15,9 +15,9 @@ namespace ProjetNET.Services
             List<Models.Task> tasks = _db.Tasks.OrderByDescending(obj => obj.DeadLine).ToList();
             return (tasks);
         }
-        public List<Models.Task> GetInvalidTasks()
+        public List<Models.Task> GetCurrentTasks()
         {
-            List<Models.Task> tasks = _db.Tasks.Where(obj => obj.Status != "Validé").OrderByDescending(obj => obj.DeadLine).ToList();
+            List<Models.Task> tasks = _db.Tasks.Where(obj => obj.Status == "En cours").OrderByDescending(obj => obj.DeadLine).ToList();
             return (tasks);
         }
         public List<Models.Task> GetCurrentTasksByUserId(Guid userId)
