@@ -33,7 +33,7 @@ namespace ProjetNET.Controllers
 
         {
             Console.WriteLine("getting all tasks ");
-            var tasks = _service.GetInvalidTasks();
+            var tasks = _service.GetCurrentTasks();
             return Ok(tasks);
         }
 
