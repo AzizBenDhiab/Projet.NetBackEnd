@@ -22,6 +22,7 @@ namespace ProjetNET.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromBody] AnonymBoxCommentForm? formData)
         {   
+
             string? contenu = formData.Contenu;
             
             _service.create_comment(contenu);
