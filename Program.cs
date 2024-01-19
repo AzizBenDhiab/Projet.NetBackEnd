@@ -24,7 +24,17 @@ builder.Services.AddScoped<AnonymBoxCommentService>();
 // Add Identity services
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+//add cors
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000") // Update with your client's origin
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
 // Add authentication and authorization
 builder.Services.AddAuthentication(options =>
 {
@@ -58,6 +68,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 // Add authentication and authorization middleware
 app.UseAuthentication();
