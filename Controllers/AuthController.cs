@@ -7,6 +7,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using NuGet.Protocol.Plugins;
 
 namespace ProjetNET.Controllers
 {
@@ -80,10 +81,18 @@ namespace ProjetNET.Controllers
 
             return Ok("User added successfully");
         }
+        public class LoginRequestWithRememberMe
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+            public bool RememberMe { get; set; }
+        }
 
         [HttpPost("login")]
-        public ActionResult<string> Login(LoginRequest loginRequest)
+        public ActionResult<string> Login(LoginRequestWithRememberMe loginRequest)
         {
+            Console.WriteLine($"RememberMe value received: {loginRequest.RememberMe}");
+
             // Validate login request
             if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
             {
@@ -100,18 +109,21 @@ namespace ProjetNET.Controllers
             }
 
             // Generate JWT token
-            var token = GenerateTokenString(user);
+            var token = GenerateTokenString(user,loginRequest.RememberMe);
+           
 
             // Set the token in a cookie
             Response.Cookies.Append("JwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true, 
-                SameSite = SameSiteMode.None, 
-                Expires = DateTime.UtcNow.AddHours(1), 
+                SameSite = SameSiteMode.None,
+                Expires = loginRequest.RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
             });
+           
 
-            return Ok("Login successful");
+            return Ok(new { Message = "Login successful" });
+
         }
 
         [HttpGet("{id:Guid}", Name = "GetUser")]
@@ -174,7 +186,7 @@ namespace ProjetNET.Controllers
             }
         }
         [NonAction]
-        public string GenerateTokenString(User user)
+        public string GenerateTokenString(User user,bool RememberMe)
         {
             var claims = new List<Claim>
             {
@@ -187,8 +199,8 @@ namespace ProjetNET.Controllers
             var signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
 
             var securityToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(60),
+            claims: claims,
+                expires: RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCred);
 
             string tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
