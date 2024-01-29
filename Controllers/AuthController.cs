@@ -148,6 +148,25 @@ namespace ProjetNET.Controllers
             return Ok(e);
         }
 
+        [HttpGet(Name = "GetAllUsers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<Event> GetAllUsers()
+        {
+
+
+            var e = _db.Users.ToList();
+
+            if (e == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(e);
+        }
+
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
