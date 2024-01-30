@@ -110,19 +110,11 @@ namespace ProjetNET.Controllers
 
             // Generate JWT token
             var token = GenerateTokenString(user,loginRequest.RememberMe);
-           
 
-            // Set the token in a cookie
-            Response.Cookies.Append("JwtToken", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true, 
-                SameSite = SameSiteMode.None,
-                Expires = loginRequest.RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
-            });
-           
 
-            return Ok(new { Message = "Login successful" });
+            return Ok(new { Message = "Login successful", Token = token });
+
+
 
         }
 
