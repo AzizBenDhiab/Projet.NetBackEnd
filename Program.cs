@@ -43,11 +43,20 @@ builder.Services.AddAuthentication(options =>
 
     };
 }
-           );
+);
+
 
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+// Add CORS configuration
+app.UseCors(builder =>
+{
+    builder.WithOrigins("http://localhost:3000")
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+           .AllowCredentials();
+});
 
 
 // Configure the HTTP request pipeline.

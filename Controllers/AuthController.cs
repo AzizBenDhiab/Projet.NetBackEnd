@@ -106,11 +106,11 @@ namespace ProjetNET.Controllers
             Response.Cookies.Append("JwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, 
-                SameSite = SameSiteMode.None, 
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(1), 
             });
-
+            
             return Ok("Login successful");
         }
 

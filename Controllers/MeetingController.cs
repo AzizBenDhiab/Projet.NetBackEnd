@@ -28,6 +28,32 @@ namespace ProjetNET.Controllers
         {
             return Ok(_context.Meetings.ToList());
         }
+        // GET: api/meetings/upcoming
+        [HttpGet("upcoming")]
+        [Authorize] // Ensure the user is authenticated
+        public IActionResult GetUpcomingMeetings()
+        {
+            // Get the current date
+            DateTime currentDate = DateTime.UtcNow;
+
+            // Get the authenticated user ID
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+            System.Diagnostics.Debug.WriteLine(userIdClaim);
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
+                return Unauthorized(jwtToken);
+            }
+
+            // Get upcoming meetings for the user
+            var upcomingMeetings = _context.Meetings
+                .Where(m => m.Date.HasValue && m.Date > currentDate && m.Users.Any(u => u.Id == userId))
+                .ToList();
+
+            return Ok(upcomingMeetings);
+        }
+
 
         // GET: api/meetings/{id}
         [HttpGet("{id}")]
@@ -62,7 +88,7 @@ namespace ProjetNET.Controllers
             }
             var meetingAttr = new Meeting
             {
-                Date = DateTime.Now,
+                Date = meeting.Date,
                 Description = meeting.Description,
                 Type = meeting.Type,
                 Name = meeting.Name,
@@ -71,8 +97,7 @@ namespace ProjetNET.Controllers
 
             // Add the meeting to the context
             _context.Meetings.Add(meetingAttr);
-           //
-           // _context.SaveChanges();
+           
 
             // Create HistoriquePresence instances for each user related to the meeting
             foreach (var user in meeting.Users)
@@ -81,13 +106,13 @@ namespace ProjetNET.Controllers
                 {
                     UserId = user.Id,
                     MeetingId = meetingAttr.Id,
-                    Presence = false // Set to false by default
+                    Presence = false // Set to null by default
 
                 };
 
                 // Add the HistoriquePresence instance to the context
                 _context.HistoriquePresences.Add(historiquePresence);
-            }
+            };
 
             // Save changes to the database
             _context.SaveChanges();
@@ -103,15 +128,19 @@ namespace ProjetNET.Controllers
 
             if (meeting == null)
             {
-                return NotFound();
+                return NotFound($"Meeting with ID {id} not found");
             }
 
             // Generate QR code for the meeting
-            var content = "https://www.facebook.com/MaIlO.AK";
+            var content = $"http://localhost:3000/meeting/qrcode/meetingId={id}";
+            System.Diagnostics.Debug.WriteLine(content);
+
             var qrCodeImage = GenerateQRCodeImage(content);
+
             // Return QR code image as a result
             return File(qrCodeImage, "image/png");
         }
+
 
 
         // POST: api/meetings/scan
@@ -125,7 +154,7 @@ namespace ProjetNET.Controllers
             }
 
             // Decode the QR code content
-            var meetingId = Guid.Parse(scanRequest.QRCodeContent);
+            var meetingId = Guid.Parse(scanRequest.QRCodeContent.Replace("http://localhost:3000/meeting/qrcode/meetingId=", ""));
 
             // Get the authenticated user ID
             // Get the user's ID from the claims in the JWT token
@@ -150,18 +179,23 @@ namespace ProjetNET.Controllers
 
             if (existingPresence != null)
             {
-                return BadRequest("User is already marked as present for this meeting");
+                // If the user is already marked as present, update the Presence field to true
+                existingPresence.Presence = true;
+            }
+            else
+            {
+                // If there is no existing entry, create a new one with Presence set to true
+                var newPresence = new HistoriquePresence
+                {
+                    UserId = userId,
+                    MeetingId = meetingId,
+                    Presence = true
+                };
+
+                _context.HistoriquePresences.Add(newPresence);
             }
 
-            // Create a new entry in HistoriquePresence
-            var newPresence = new HistoriquePresence
-            {
-                UserId = userId,
-                MeetingId = meetingId,
-                Presence = true
-            };
-
-            _context.HistoriquePresences.Add(newPresence);
+            // Save changes to the database
             _context.SaveChanges();
 
             return Ok("User presence marked for the meeting");
@@ -243,8 +277,9 @@ namespace ProjetNET.Controllers
         }
     }
 
-    public class QRCodeScanRequest
-    {
-        public string QRCodeContent { get; set; }
-    }
+      
+        public class QRCodeScanRequest
+        {
+            public string QRCodeContent { get; set; }
+        }
 }
