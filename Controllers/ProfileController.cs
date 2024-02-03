@@ -67,14 +67,14 @@ namespace ProjetNET.Controllers
             return Ok(profileData);
         }
 
-        [HttpGet]
+        [HttpGet("Blames")]
         public ActionResult<object> GetUserWarnings(Guid userId)
         {
             var userBlames = _db.Blames.Where(w => w.UserId.Equals( userId)).ToList();
             return Ok(userBlames) ;
         }
 
-        [HttpPost]
+        [HttpPost("Blames")]
         public ActionResult<object> AddUserBlame(Guid userId, string objet, string name, string contention)
         {
             var newBlame = new Blame
@@ -92,7 +92,7 @@ namespace ProjetNET.Controllers
             return Ok("blame added successfully");
         }
 
-        [HttpDelete]
+        [HttpDelete("Blames")]
 
         public ActionResult<object> DeleteBlame(Guid BlameId)
         {
@@ -111,14 +111,14 @@ namespace ProjetNET.Controllers
         //Medal
 
 
-        [HttpGet("api/Profile/Medals")]
+        [HttpGet("Medals")]
         public ActionResult<object> GetUserMedals(Guid userId)
         {
             var userMedals = _db.Medals.Where(w => w.UserId.Equals(userId)).ToList();
             return Ok(userMedals);
         }
 
-        [HttpPost("api/Profile/Medals")]
+        [HttpPost("Medals")]
         public ActionResult<object> AddUserMedal(Guid userId, string type, string name, string description, DateTime date)
         {
             var newMedal = new Medal
@@ -137,7 +137,7 @@ namespace ProjetNET.Controllers
             return Ok("medal added successfully");
         }
 
-        [HttpDelete("api/Profile/Medals")]
+        [HttpDelete("Medals")]
 
         public ActionResult<object> DeleteMedal (Guid MedalId)
         {
