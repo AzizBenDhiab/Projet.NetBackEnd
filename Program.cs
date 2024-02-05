@@ -69,6 +69,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
 app.UseCors();
 
 // Add authentication and authorization middleware
