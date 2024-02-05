@@ -6,6 +6,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using Bogus.DataSets;
 
 namespace ProjetNET.Controllers
 {
@@ -20,20 +21,11 @@ namespace ProjetNET.Controllers
         {
             _db = db;
         }
-        //[HttpGet]
-        //public ActionResult<IEnumerable<HistoriquePresence>> GetHistoriquePresences(Guid id) 
-        //{
-        //    var historique = _db.HistoriquePresences.Where(h => h.UserId == id)
-        //                                            .ToList();
-        //    return Ok(historique);
-        //}
-        //[HttpGet]
-        //public ActionResult<IEnumerable<User>> GetUsers (Guid id)
-        //{
-        //    var user= _db.Users.FirstOrDefault( u => u.Id == id);
 
-        //    return Ok(user);
-        //}
+
+        
+
+
         [HttpGet("/Profile")]
         public ActionResult<object> GetUserAndHistorique()
         {
@@ -54,12 +46,46 @@ namespace ProjetNET.Controllers
                 return NotFound("User not found");
             }
 
-            var historique = _db.HistoriquePresences.Where(h => h.UserId == userId).ToList();
+
+                 var histoPresencesData = _db.HistoriquePresences
+                .Where(h => h.UserId == userId)
+                .Select(h => new 
+                {
+                    Name = h.Meeting.Name,
+                    Description = h.Meeting.Description,
+                    Date = h.Meeting.Date,
+                    Validation = h.Presence,
+                    Cause = h.Cause,
+                    EventType = "Meeting"
+
+                })
+                .ToList();
+
+            var histoTasksData = _db.ValidationTasks
+               .Where(h => h.UserId == userId)
+               .Select(h => new {
+                   Name = h.Task.Name,
+                   Description = h.Task.Description,
+                   Date=h.Task.DeadLine,
+                   Validation = h.Validation,
+                   Cause = h.Cause,
+                   EventType = "Task"
+               })
+               .ToList();
+
+
+            var combinedData = histoPresencesData
+       .Concat(histoTasksData)
+       .OrderBy(e => e.Date)
+       .ToList();
+
+
+            
 
             var profileData = new
             {
                 UserData = user,
-                HistoriqueData = historique
+                histoData= combinedData,
             };
 
             return Ok(profileData);
@@ -69,3 +95,29 @@ namespace ProjetNET.Controllers
 
     }
 }
+
+
+
+//      var combinedData = histoPresencesData
+//.Select(e => new
+//{
+//    Name = e.Name,
+//    Description = e.Description,
+//    Date = e.Date,
+//    Validation = e.Validation,
+//    Cause = e.Cause,
+//    EventType = e.EventType
+//})
+//.Concat(histoTasksData
+//    .Select(e => new
+//    {
+//        Name = e.Name,
+//        Description = e.Description,
+//        Date = e.Date,
+//        Validation = e.Validation,
+//        Cause = e.Cause,
+//        EventType = e.EventType
+//    })
+//)
+//.OrderBy(e => e.Date)
+//.ToList();
