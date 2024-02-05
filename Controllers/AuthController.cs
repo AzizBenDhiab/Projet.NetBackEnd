@@ -7,6 +7,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using NuGet.Protocol.Plugins;
 
 namespace ProjetNET.Controllers
 {
@@ -80,10 +81,18 @@ namespace ProjetNET.Controllers
 
             return Ok("User added successfully");
         }
+        public class LoginRequestWithRememberMe
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+            public bool RememberMe { get; set; }
+        }
 
         [HttpPost("login")]
-        public ActionResult<string> Login(LoginRequest loginRequest)
+        public ActionResult<string> Login(LoginRequestWithRememberMe loginRequest)
         {
+            Console.WriteLine($"RememberMe value received: {loginRequest.RememberMe}");
+
             // Validate login request
             if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
             {
@@ -105,18 +114,77 @@ namespace ProjetNET.Controllers
                 return StatusCode(500, "An error occurred during authentication");
             }*/
             // Generate JWT token
-            var token = GenerateTokenString(user);
+            var token = GenerateTokenString(user,loginRequest.RememberMe);
 
-            // Set the token in a cookie
-            Response.Cookies.Append("JwtToken", token, new CookieOptions
+
+            return Ok(new { Message = "Login successful", Token = token });
+
+
+
+        }
+
+        [HttpGet("{id:Guid}", Name = "GetUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<Event> GetUser(Guid id)
+        {
+            if (id == Guid.Empty)
             {
-                HttpOnly = true,
-                Secure = true, 
-                SameSite = SameSiteMode.None, 
-                Expires = DateTime.UtcNow.AddHours(1), 
-            });
+                return BadRequest();
+            }
 
-            return Ok("Login successful");
+            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+
+            if (e == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(e);
+        }
+
+        [HttpGet(Name = "GetAllUsers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<Event> GetAllUsers()
+        {
+
+
+            var e = _db.Users.ToList();
+
+            if (e == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(e);
+        }
+
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
+
+        [HttpDelete("{id:Guid}", Name = "Delete")]
+        public IActionResult Delete(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest();
+            }
+            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            if (e == null)
+            {
+                return NotFound();
+            }
+            _db.Users.Remove(e);
+            _db.SaveChanges();
+            return NoContent();
         }
 
         // Validate email format
@@ -134,12 +202,15 @@ namespace ProjetNET.Controllers
             }
         }
         [NonAction]
-        public string GenerateTokenString(User user)
+
+
+        public string GenerateTokenString(User user,bool RememberMe)
+
         {
             var claims = new List<Claim>
             {
-               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User"),
+              new Claim("id", user.Id.ToString()),
+                    new Claim("role", user.IsAdmin ? "Admin" : "User"),
             };
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value));
@@ -147,8 +218,8 @@ namespace ProjetNET.Controllers
             var signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
 
             var securityToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(60),
+            claims: claims,
+                expires: RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCred);
 
             string tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
