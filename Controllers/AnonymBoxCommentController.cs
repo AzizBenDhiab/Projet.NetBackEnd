@@ -22,6 +22,7 @@ namespace ProjetNET.Controllers
         [HttpPost("create")]
         public ActionResult Create([FromBody] AnonymBoxCommentForm? formData)
         {   
+
             if(formData == null | formData.Contenu=="")
             {
                 return BadRequest("formulaire vide");

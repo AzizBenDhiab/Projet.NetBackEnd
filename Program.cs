@@ -12,13 +12,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+builder.Services.AddHostedService<DeadlineChecker>();
+
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddHostedService<DataSeeder>();
-//builder.Services.AddHostedService<DataSeeder2>();
+builder.Services.AddHostedService<DataSeeder>();
+builder.Services.AddHostedService<DataSeeder2>();
 builder.Services.AddScoped<AnonymBoxCommentService>();
+builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<ValidationTaskService>();
 
 
 // Add Identity services
@@ -70,7 +75,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
+
 app.UseCors();
+
 
 // Add authentication and authorization middleware
 app.UseAuthentication();
