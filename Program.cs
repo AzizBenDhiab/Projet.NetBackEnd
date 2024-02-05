@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 
-//builder.Services.AddHostedService<DeadlineChecker>();
+builder.Services.AddHostedService<DeadlineChecker>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
