@@ -56,6 +56,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+
+
+
+
+
+// Add CORS configuration
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
+
 // Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
