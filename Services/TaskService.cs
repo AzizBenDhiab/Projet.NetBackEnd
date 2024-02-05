@@ -22,18 +22,25 @@ namespace ProjetNET.Services
         }
         public List<Models.Task> GetCurrentTasksByUserId(Guid userId)
         {
-            var taskvalidations = _db.ValidationTasks.Where(c => c.UserId == userId);
+            var taskvalidations = _db.ValidationTasks.Where(c => c.UserId == userId).ToList();
+    
             List<Models.Task> tasks = new List<Models.Task>();
+
             foreach (var taskvalidation in taskvalidations)
             {
-                var task = _db.Tasks.FirstOrDefault(c => c.Id == taskvalidation.TaskId);
-                if (task!=null && task.Status=="En cours")
+                Console.WriteLine(taskvalidation.TaskId);
+                using (var reader = _db.Tasks.Where(c => c.Id == taskvalidation.TaskId && c.Status == "En cours").Take(1).GetEnumerator())
                 {
-                    tasks.Add(task);
+                    if (reader.MoveNext())
+                    {
+                        Console.WriteLine("adding task to return");
+                        tasks.Add(reader.Current);
+                    }
                 }
             }
             return tasks;
         }
+
         public void CreateTask(TaskForm taskForm)
         {
             Models.Task task = new Models.Task()
@@ -41,7 +48,8 @@ namespace ProjetNET.Services
                 DeadLine = taskForm.DeadLine,
                 Description = taskForm.Description,
                 Name = taskForm.Name,
-                Status = "En cours"  
+                Status = "En cours",
+                Users = new List<Models.User>()
             };
             _db.Tasks.Add(task);
             _db.SaveChanges();
@@ -57,11 +65,7 @@ namespace ProjetNET.Services
                         Validation = false,
                     };
                     _db.ValidationTasks.Add(taskValidation);
-                }
-                
-                    
-                   
-                
+                }  
             }
             _db.SaveChanges();
 
