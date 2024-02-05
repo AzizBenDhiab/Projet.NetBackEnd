@@ -30,8 +30,9 @@ public class DeadlineChecker : BackgroundService
                 foreach (var entity in entitiesWithDeadlines)
                 {
                     entity.Status = "Terminé";
-                    dbContext.SaveChanges();
+                    
                 }
+                dbContext.SaveChanges();
             }
             await System.Threading.Tasks.Task.Delay(12000, stoppingToken);
         }
