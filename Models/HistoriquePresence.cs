@@ -14,5 +14,6 @@ namespace ProjetNET.Models
         public bool Presence {  get; set; }
         public bool Confirmation { get; set; }
         public String? Cause { get; set; }
+        public User User { get; internal set; }
     }
 }

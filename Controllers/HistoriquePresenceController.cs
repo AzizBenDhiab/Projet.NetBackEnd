@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace ProjetNET.Controllers
 {
     [Route("api/historique-presences")]
+    [Authorize]
     [ApiController]
     public class HistoriquePresenceController : ControllerBase
     {
@@ -20,9 +21,23 @@ namespace ProjetNET.Controllers
         }
 
         // GET: api/historique-presences/meeting-attendees/{id}
+        [Authorize(Roles = "Admin")]
         [HttpGet("meeting-attendees/{id}")]
         public ActionResult<IEnumerable<object>> GetMeetingAttendees([FromBody] Guid id)
         {
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(jwtToken);
+            }
+            var isAdmin = HttpContext.User.IsInRole("Admin");
+
+            if (!isAdmin)
+            {
+                return Forbid();
+            }
             // Check if the meeting exists
             var meeting = _context.Meetings.Find(id);
             if (meeting == null)
@@ -47,10 +62,24 @@ namespace ProjetNET.Controllers
         }
 
 
-        // GET: api/historique-presences/meeting-attendees/{id}
+        // GET: api/historique-presences/meeting-confirmation/{id}
         [HttpGet("meeting-confirmation/{id}")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<IEnumerable<object>> GetMeetingConfirmed([FromBody] Guid id)
         {
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(jwtToken);
+            }
+            var isAdmin = HttpContext.User.IsInRole("Admin");
+
+            if (!isAdmin)
+            {
+                return Forbid();
+            }
             // Check if the meeting exists
             var meeting = _context.Meetings.Find(id);
             if (meeting == null)
@@ -59,7 +88,7 @@ namespace ProjetNET.Controllers
             }
 
             // Get the users who attended the meeting (presence = true)
-            var attendees = _context.HistoriquePresences
+            var confirmed = _context.HistoriquePresences
             .Where(h => h.MeetingId == id && h.Confirmation)
             .Include(h => h.User)  // Eager load the User property
             .Select(h => new
@@ -72,26 +101,27 @@ namespace ProjetNET.Controllers
             .ToList();
 
 
-            return Ok(attendees);
+            return Ok(confirmed);
         }
         
         // PATCH: api/historique-presences/confirm-presence/
         [HttpPatch("confirm-presence")]
-        [Authorize]
         public ActionResult ConfirmPresence([FromBody] Guid meetingId)
         {
 
 
             // Get the authenticated user ID
             // Get the user's ID from the claims in the JWT token
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            // Get the authenticated user ID
+            var userIdClaim = HttpContext.User.FindFirst("id");
             var jwtToken = HttpContext.Request.Headers["Authorization"];
 
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            if (userIdClaim == null)
             {
                 return Unauthorized(jwtToken);
             }
-            System.Diagnostics.Debug.WriteLine(userId);
+            string userIdString = userIdClaim.Value;
+            Guid userId = new Guid(userIdString);
 
             // Check if the HistoriquePresence entry exists
             var presenceEntry = _context.HistoriquePresences

@@ -11,6 +11,7 @@ using System.Security.Claims;
 namespace ProjetNET.Controllers
 {
     [Route("api/meetings")]
+    [Authorize]
     [ApiController]
     public class MeetingsController : ControllerBase
     {
@@ -22,6 +23,7 @@ namespace ProjetNET.Controllers
         }
 
         // GET: api/meetings
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<Meeting>> GetMeetings()
@@ -45,12 +47,73 @@ namespace ProjetNET.Controllers
 
             return Ok(meeting);
         }
+        // GET: api/meetings/upcoming
+        [HttpGet("upcoming")]
+        [Authorize] // Ensure the user is authenticated
+        public IActionResult GetUpcomingMeetings()
+        {
+            // Get the current date
+            DateTime currentDate = DateTime.UtcNow;
+            // Get the authenticated user ID
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+           
+            if (userIdClaim == null )
+            {
+                return Unauthorized(jwtToken);
+            }
+            string userIdString = userIdClaim.Value;
+            Guid userId = new Guid(userIdString);
+
+            // Get upcoming meetings for the user
+            var upcomingMeetings = _context.Meetings
+                .Where(m => m.Date.HasValue && m.Date > currentDate && m.Users.Any(u => u.Id == userId))
+                .ToList();
+
+            return Ok(upcomingMeetings);
+        }
+        // GET: api/meetings/mymeetings
+        [HttpGet("mymeetings")]
+        [Authorize] // Ensure the user is authenticated
+        public IActionResult GetUserMeetings()
+        {
+            // Get the authenticated user ID
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(jwtToken);
+            }
+            string userIdString = userIdClaim.Value;
+            Guid userId = new Guid(userIdString);
+
+            // Get upcoming meetings for the user
+            var upcomingMeetings = _context.Meetings
+                .Where(m =>  m.Users.Any(u => u.Id == userId))
+                .ToList();
+
+            return Ok(upcomingMeetings);
+        }
 
         // POST: api/meetings
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<Meeting> PostMeeting([FromBody] Meeting meeting)
         {
-            System.Diagnostics.Debug.WriteLine(meeting);
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(jwtToken);
+            }
+            var isAdmin = HttpContext.User.IsInRole("Admin");
+
+            if (!isAdmin)
+            {
+                return Forbid();
+            }
 
             if (meeting == null)
             {
@@ -96,9 +159,24 @@ namespace ProjetNET.Controllers
         }
 
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}/qrcode")]
         public IActionResult GetMeetingQRCode(Guid id)
         {
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            var jwtToken = HttpContext.Request.Headers["Authorization"];
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(jwtToken);
+            }
+            var isAdmin = HttpContext.User.IsInRole("Admin");
+
+            if (!isAdmin)
+            {
+                return Forbid(); 
+            }
+
             var meeting = _context.Meetings.Find(id);
 
             if (meeting == null)
@@ -107,7 +185,7 @@ namespace ProjetNET.Controllers
             }
 
             // Generate QR code for the meeting
-            var content = "https://www.facebook.com/MaIlO.AK";
+            var content = "localhost:3000/scan/{id}";
             var qrCodeImage = GenerateQRCodeImage(content);
             // Return QR code image as a result
             return File(qrCodeImage, "image/png");
