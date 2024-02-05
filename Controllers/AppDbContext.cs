@@ -20,6 +20,7 @@ namespace ProjetNET.Controllers
         public DbSet<Medal> Medals { get; set; }
         public DbSet<Notification> Notifications { get; set; } 
         public DbSet<ValidationTask> ValidationTasks { get; set; }
+        public DbSet<PasswordRecovery> PasswordRecoveries { get; set; }
 
         public AppDbContext(DbContextOptions options)
          : base(options)
