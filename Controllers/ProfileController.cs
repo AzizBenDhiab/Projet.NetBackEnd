@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetNET.Models;
 using System.Security.Claims;
@@ -36,7 +36,7 @@ namespace ProjetNET.Controllers
         //}
         [HttpGet("/Profile")]
         public ActionResult<object> GetUserAndHistorique()
-        { // Get the authenticated user ID
+        {
             // Get the user's ID from the claims in the JWT token
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
             var jwtToken = HttpContext.Request.Headers["Authorization"];
@@ -45,7 +45,6 @@ namespace ProjetNET.Controllers
             {
                 return Unauthorized(jwtToken);
             }
-
 
             // Now you have the user ID, and you can use it to fetch user data and historique
             var user = _db.Users.FirstOrDefault(u => u.Id == userId);
