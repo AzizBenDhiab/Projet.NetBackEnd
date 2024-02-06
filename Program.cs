@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,13 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddControllers();
+builder.Services.AddHttpLogging(logging => {
+    logging.LoggingFields =
+        HttpLoggingFields.RequestHeaders |
+        HttpLoggingFields.RequestMethod; 
+});
 
 
 builder.Services.AddHostedService<DeadlineChecker>();
@@ -58,7 +66,7 @@ builder.Services.AddAuthentication(options =>
         ValidateActor = true,
         ValidateIssuer = false,
         ValidateAudience = false,
-        RequireExpirationTime = true,
+        RequireExpirationTime = false,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value))
 
@@ -69,7 +77,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
+app.UseHttpLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -77,8 +85,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseHttpLogging();
 app.UseHttpsRedirection();
+app.UseCors();
 
 
 

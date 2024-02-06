@@ -1,4 +1,4 @@
-﻿namespace ProjetNET.Models
+namespace ProjetNET.Models
 {
     public class Meeting
     {
@@ -8,6 +8,7 @@
         public string? Type { get; set; }
         public string? Location { get; set; }
         public DateTime? Date { get; set; }
+
 
         public virtual ICollection<User>? Users { get; set; }
 

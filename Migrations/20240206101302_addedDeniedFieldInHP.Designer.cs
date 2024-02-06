@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetNET.Controllers;
 
@@ -11,9 +12,11 @@ using ProjetNET.Controllers;
 namespace ProjetNET.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240206101302_addedDeniedFieldInHP")]
+    partial class addedDeniedFieldInHP
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -409,7 +412,7 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.HistoriquePresence", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Meeting", "Meeting")
+                    b.HasOne("ProjetNET.Models.Meeting", null)
                         .WithMany()
                         .HasForeignKey("MeetingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -422,7 +425,6 @@ namespace ProjetNET.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                    b.Navigation("Meeting");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.Medal", b =>
@@ -445,7 +447,7 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.ValidationTask", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Task", "Task")
+                    b.HasOne("ProjetNET.Models.Task", null)
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -456,8 +458,6 @@ namespace ProjetNET.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("ProjetUser", b =>

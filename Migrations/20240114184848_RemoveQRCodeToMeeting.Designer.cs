@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetNET.Controllers;
 
@@ -11,9 +12,11 @@ using ProjetNET.Controllers;
 namespace ProjetNET.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240114184848_RemoveQRCodeToMeeting")]
+    partial class RemoveQRCodeToMeeting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,12 +135,6 @@ namespace ProjetNET.Migrations
                     b.Property<string>("Cause")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Confirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Denied")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Presence")
                         .HasColumnType("bit");
 
@@ -193,6 +190,10 @@ namespace ProjetNET.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("QRCode")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -409,20 +410,17 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.HistoriquePresence", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Meeting", "Meeting")
+                    b.HasOne("ProjetNET.Models.Meeting", null)
                         .WithMany()
                         .HasForeignKey("MeetingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjetNET.Models.User", "User")
+                    b.HasOne("ProjetNET.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                    b.Navigation("Meeting");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.Medal", b =>
@@ -445,7 +443,7 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.ValidationTask", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Task", "Task")
+                    b.HasOne("ProjetNET.Models.Task", null)
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -456,8 +454,6 @@ namespace ProjetNET.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("ProjetUser", b =>
