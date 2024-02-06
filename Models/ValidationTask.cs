@@ -9,6 +9,7 @@ namespace ProjetNET.Models
 
         [ForeignKey(nameof(Task))]
         public Guid TaskId { get; set; }
+        public Task Task { get; set; }
         public bool Validation { get; set; }
         public String? Cause { get; set; }
     }

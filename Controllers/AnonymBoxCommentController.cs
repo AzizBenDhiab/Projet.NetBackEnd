@@ -15,17 +15,22 @@ namespace ProjetNET.Controllers
         }
 
         [HttpGet("index")]
-        public object Index()
+        public ActionResult<List<AnonymBoxComment>> Index()
         {   List<AnonymBoxComment> comments=_service.display_comments();
-            return comments;
+            return Ok(comments);
         }
         [HttpPost("create")]
-        public IActionResult Create([FromBody] AnonymBoxCommentForm? formData)
+        public ActionResult Create([FromBody] AnonymBoxCommentForm? formData)
         {   
+
+            if(formData == null | formData.Contenu=="")
+            {
+                return BadRequest("formulaire vide");
+            }
             string? contenu = formData.Contenu;
             
             _service.create_comment(contenu);
-            return (RedirectToAction("Index"));
+            return Ok("commentaire ajouté");
         }
 
     }
