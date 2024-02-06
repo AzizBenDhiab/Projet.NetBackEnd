@@ -100,7 +100,7 @@ namespace ProjetNET.Controllers
             }
 
             // Find the user by email
-            var user = _db.Users.FirstOrDefault(u => u.Email == loginRequest.Email);
+            var user = _db.Users.FirstOrDefault(u => u.Email == loginRequest.Email && u.DeletedAt==null );
              
             // Check if the user exists and verify the password
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
@@ -135,7 +135,7 @@ namespace ProjetNET.Controllers
                 return BadRequest();
             }
 
-            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            var e = _db.Users.FirstOrDefault(u => u.Id == id && u.DeletedAt == null);
 
             if (e == null)
             {
@@ -154,14 +154,14 @@ namespace ProjetNET.Controllers
         {
 
 
-            var e = _db.Users.ToList();
+            var users = _db.Users.Where(u => u.DeletedAt == null).ToList();
 
-            if (e == null)
+            if (users == null)
             {
                 return NotFound();
             }
 
-            return Ok(e);
+            return Ok(users);
         }
 
 
@@ -177,15 +177,46 @@ namespace ProjetNET.Controllers
             {
                 return BadRequest();
             }
-            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            var e = _db.Users.FirstOrDefault(u => u.Id == id && u.DeletedAt==null);
             if (e == null)
             {
                 return NotFound();
             }
-            _db.Users.Remove(e);
+            e.DeletedAt = DateTime.Now; 
+          
             _db.SaveChanges();
             return NoContent();
         }
+
+        [HttpDelete("deletemembers")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteMembers([FromBody] List<Guid> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return BadRequest("No user IDs provided for deletion");
+            }
+
+            var usersToDelete = _db.Users.Where(u => ids.Contains(u.Id) && u.DeletedAt == null).ToList();
+            if (usersToDelete.Count == 0)
+            {
+                return NotFound("No users found with the provided IDs");
+            }
+            var currentTime = DateTime.Now;
+            foreach (var user in usersToDelete)
+            {
+                user.DeletedAt = currentTime;
+            }
+
+            
+
+            _db.SaveChanges();
+
+            return NoContent();
+        }
+
 
         // Validate email format
         [NonAction]
@@ -225,6 +256,9 @@ namespace ProjetNET.Controllers
             return tokenString;
         }
     }
+
+
+
 
 
 
