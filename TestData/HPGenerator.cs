@@ -23,7 +23,9 @@ namespace ProjetNET.TestData
             fakeHP = new Faker<HistoriquePresence>()
 
            .RuleFor(t => t.Presence, f => false)
-           .RuleFor(t => t.Confirmation, f => false)
+           .RuleFor(t => t.Confirmed, f => false)
+           .RuleFor(t => t.Denied, f => false)
+
            .RuleFor(t => t.Cause, f => f.Lorem.Paragraph())
            .RuleFor(t => t.UserId, f => f.PickRandom(_userIds))
            .RuleFor(t => t.MeetingId, f => f.PickRandom(_meetingsIds));

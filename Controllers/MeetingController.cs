@@ -185,7 +185,7 @@ namespace ProjetNET.Controllers
             }
 
             // Generate QR code for the meeting
-            var content = "localhost:3000/scan/{id}";
+            var content = "localhost:3000/scan/"+id;
             var qrCodeImage = GenerateQRCodeImage(content);
             // Return QR code image as a result
             return File(qrCodeImage, "image/png");
@@ -194,29 +194,29 @@ namespace ProjetNET.Controllers
 
         // POST: api/meetings/scan
         [HttpPost("scan")]
-        [Authorize] // Ensure the user is authenticated
         public IActionResult ScanMeetingQRCode([FromBody] QRCodeScanRequest scanRequest)
         {
-            if (scanRequest == null || string.IsNullOrEmpty(scanRequest.QRCodeContent))
+            string meetingId = scanRequest.meetingId;
+            if (meetingId == null)
             {
                 return BadRequest("Invalid QR code data");
             }
 
-            // Decode the QR code content
-            var meetingId = Guid.Parse(scanRequest.QRCodeContent);
+            Guid meetingIdGuid= new Guid(meetingId);
 
-            // Get the authenticated user ID
-            // Get the user's ID from the claims in the JWT token
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = HttpContext.User.FindFirst("id");
             var jwtToken = HttpContext.Request.Headers["Authorization"];
 
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            if (userIdClaim == null)
             {
                 return Unauthorized(jwtToken);
             }
+            string userIdString = userIdClaim.Value;
+
+            Guid userId = new Guid(userIdString);
 
             // Check if the meeting exists
-            var meeting = _context.Meetings.Find(meetingId);
+            var meeting = _context.Meetings.Find(meetingIdGuid);
             if (meeting == null)
             {
                 return NotFound("Meeting not found");
@@ -224,25 +224,27 @@ namespace ProjetNET.Controllers
 
             // Check if the user is already marked as present
             var existingPresence = _context.HistoriquePresences
-                .FirstOrDefault(p => p.UserId == userId && p.MeetingId == meetingId);
+                .FirstOrDefault(p => p.UserId == userId && p.MeetingId == meetingIdGuid);
 
-            if (existingPresence != null)
+            if (existingPresence == null)
             {
-                return BadRequest("User is already marked as present for this meeting");
+                // Create a new entry in HistoriquePresence
+                var newPresence = new HistoriquePresence
+                {
+                    UserId = userId,
+                    MeetingId = meetingIdGuid,
+                    Presence = true
+                };
+
+                _context.HistoriquePresences.Add(newPresence);
+
             }
-
-            // Create a new entry in HistoriquePresence
-            var newPresence = new HistoriquePresence
-            {
-                UserId = userId,
-                MeetingId = meetingId,
-                Presence = true
-            };
-
-            _context.HistoriquePresences.Add(newPresence);
+            else { existingPresence.Presence = true; }
             _context.SaveChanges();
 
             return Ok("User presence marked for the meeting");
+
+
         }
 
         // Utility method to generate QR code image
@@ -323,6 +325,6 @@ namespace ProjetNET.Controllers
 
     public class QRCodeScanRequest
     {
-        public string QRCodeContent { get; set; }
+        public string meetingId { get; set; }
     }
 }
