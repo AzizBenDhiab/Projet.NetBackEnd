@@ -6,7 +6,7 @@ using ProjetNET.Services;
 namespace ProjetNET.Controllers
 {
     [Route("[controller]")]
-    [Authorize]
+   // [Authorize]
     public class AnonymBoxCommentController : Controller
     { public readonly AnonymBoxCommentService _service;
         public AnonymBoxCommentController(AnonymBoxCommentService service)

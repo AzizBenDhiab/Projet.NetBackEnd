@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ProjetNET.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -202,8 +202,6 @@ namespace ProjetNET.Controllers
             }
         }
         [NonAction]
-
-
         public string GenerateTokenString(User user,bool RememberMe)
 
         {
@@ -219,6 +217,7 @@ namespace ProjetNET.Controllers
 
             var securityToken = new JwtSecurityToken(
             claims: claims,
+
                 expires: RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCred);
 
@@ -226,8 +225,8 @@ namespace ProjetNET.Controllers
             return tokenString;
         }
     }
-   
-    
+
+
 
     public class LoginRequest
     {
