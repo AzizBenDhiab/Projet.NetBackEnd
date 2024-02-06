@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using ProjetNET.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ProjetNET.Controllers
 {
     [Route("api/Events")]
     [ApiController]
+    [Authorize]
     public class EventsController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -19,13 +22,14 @@ namespace ProjetNET.Controllers
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
-        
+
         [HttpGet(Name = "GetEvents")]
         public ActionResult<List<Event>> GetAllEvents()
         {
             List<Event> e = _db.Events.ToList();
             return Ok(e);
         }
+
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,8 +52,9 @@ namespace ProjetNET.Controllers
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
         [HttpPost(Name ="AddEvent")]
+        [Authorize(Roles = "Admin")]
+
         public ActionResult<Event> PostEvent([FromBody] Event e)
         {
             if (e == null)
@@ -71,6 +76,7 @@ namespace ProjetNET.Controllers
 
 
         [HttpDelete("{id:Guid}", Name ="DeleteEvent")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteEvent(Guid id)
         {
             if (id == Guid.Empty)
@@ -92,6 +98,8 @@ namespace ProjetNET.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
         [HttpPut("{id:Guid}", Name ="EditEvent")]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult EditEvent(Guid id, [FromBody] Event e)
         {
             if ((id != e.Id) || (e == null))
@@ -118,6 +126,7 @@ namespace ProjetNET.Controllers
 
 
         [HttpPatch("{id:Guid}", Name = "EditPartialEvent")]
+        [Authorize(Roles = "Admin")]
         public IActionResult EditPartialEvent(Guid id,JsonPatchDocument<Event>patch)
         {
             if ((id ==Guid.Empty) || (patch == null))
