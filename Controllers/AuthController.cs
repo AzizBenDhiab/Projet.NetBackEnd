@@ -17,7 +17,7 @@ namespace ProjetNET.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IConfiguration _config;
-
+        
         public AuthController(AppDbContext db, IConfiguration config)
         {
             _db = db;
@@ -101,15 +101,20 @@ namespace ProjetNET.Controllers
 
             // Find the user by email
             var user = _db.Users.FirstOrDefault(u => u.Email == loginRequest.Email);
-
+             
             // Check if the user exists and verify the password
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
             {
                 return Unauthorized("Invalid email or password");
-            }
-
+            } 
+            /*catch (Exception ex)
+{
+                // Log the exception or handle it appropriately
+                // Returning Unauthorized might not be suitable for all cases where an exception occurs
+                return StatusCode(500, "An error occurred during authentication");
+            }*/
             // Generate JWT token
-            var token = GenerateTokenString(user, loginRequest.RememberMe);
+            var token = GenerateTokenString(user,loginRequest.RememberMe);
 
 
             return Ok(new { Message = "Login successful", Token = token });
@@ -197,7 +202,8 @@ namespace ProjetNET.Controllers
             }
         }
         [NonAction]
-        public string GenerateTokenString(User user, bool RememberMe)
+        public string GenerateTokenString(User user,bool RememberMe)
+
         {
             var claims = new List<Claim>
             {
@@ -211,6 +217,7 @@ namespace ProjetNET.Controllers
 
             var securityToken = new JwtSecurityToken(
             claims: claims,
+
                 expires: RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCred);
 
