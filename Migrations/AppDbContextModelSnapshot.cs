@@ -37,6 +37,32 @@ namespace ProjetNET.Migrations
                     b.ToTable("EquipeUser");
                 });
 
+            modelBuilder.Entity("PasswordRecovery", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RecoveryCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordRecoveries");
+                });
+
             modelBuilder.Entity("ProjetNET.Models.AnonymBoxComment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -387,6 +413,17 @@ namespace ProjetNET.Migrations
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PasswordRecovery", b =>
+                {
+                    b.HasOne("ProjetNET.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.Blame", b =>
