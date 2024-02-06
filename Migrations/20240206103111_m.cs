@@ -5,7 +5,7 @@
 namespace ProjetNET.Migrations
 {
     /// <inheritdoc />
-    public partial class ajoutProprieteNavig : Migration
+    public partial class m : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
