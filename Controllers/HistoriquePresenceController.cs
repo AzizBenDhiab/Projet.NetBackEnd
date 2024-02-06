@@ -139,6 +139,8 @@ namespace ProjetNET.Controllers
 
             // Confirm the presence by setting Confirmation to true
             presenceEntry.Confirmed = true;
+            presenceEntry.Denied = false;
+
 
             // Save changes to the database
             _context.SaveChanges();
@@ -146,7 +148,7 @@ namespace ProjetNET.Controllers
             return Ok("Presence confirmed successfully");
            
         }
-        // PATCH: api/historique-presences/confirm-presence/
+        // PATCH: api/historique-presences/deny-presence/
         [HttpPatch("deny-presence")]
         public ActionResult DenyPresence([FromBody] MeetingObj meeting)
         {
@@ -175,6 +177,7 @@ namespace ProjetNET.Controllers
 
             // Confirm the presence by setting Confirmation to true
             presenceEntry.Denied = true;
+            presenceEntry.Confirmed = false;
 
             // Save changes to the database
             _context.SaveChanges();
