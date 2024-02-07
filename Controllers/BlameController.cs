@@ -7,6 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
 using Bogus.DataSets;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ProjetNET.Controllers
 {
@@ -69,15 +71,29 @@ namespace ProjetNET.Controllers
         }
 
         [HttpPatch("{blameId}")]
-        [Authorize(Roles = "User")]
-        public ActionResult<object> AddContest(Guid blameId,[FromBody] string? contestation)
+        public IActionResult AddContest(Guid blameId, [FromBody] JsonPatchDocument<Blame> patch)
         {
-            var blame = _db.Blames.Where(w => w.Id.Equals(blameId)).FirstOrDefault();
-            if (blame == null) { return NotFound(); }
-            blame.Contention = contestation;
+            if ((blameId == Guid.Empty) || (patch == null))
+            {
+                return BadRequest();
+            }
+            var entity = _db.Blames.FirstOrDefault(u => u.Id == blameId); ;
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            patch.ApplyTo(entity, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             _db.SaveChanges();
 
-            return Ok("contention added successfully");
+            return NoContent();
         }
 
 
