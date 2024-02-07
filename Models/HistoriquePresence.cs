@@ -11,6 +11,7 @@ namespace ProjetNET.Models
 
         [ForeignKey(nameof(Meeting))]
         public Guid MeetingId { get; set; }
+        public Meeting Meeting { get; set; }
         public bool Presence {  get; set; } 
         public String? Cause { get; set; }
     }

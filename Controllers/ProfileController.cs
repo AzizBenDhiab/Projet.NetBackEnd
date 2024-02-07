@@ -6,8 +6,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Bogus.DataSets;
 
 namespace ProjetNET.Controllers
 {
@@ -22,25 +21,16 @@ namespace ProjetNET.Controllers
         {
             _db = db;
         }
-        //[HttpGet]
-        //public ActionResult<IEnumerable<HistoriquePresence>> GetHistoriquePresences(Guid id) 
-        //{
-        //    var historique = _db.HistoriquePresences.Where(h => h.UserId == id)
-        //                                            .ToList();
-        //    return Ok(historique);
-        //}
-        //[HttpGet]
-        //public ActionResult<IEnumerable<User>> GetUsers (Guid id)
-        //{
-        //    var user= _db.Users.FirstOrDefault( u => u.Id == id);
 
-        //    return Ok(user);
-        //}
+
+        
+
+
         [HttpGet("/Profile")]
         public ActionResult<object> GetUserAndHistorique()
         {
             // Get the user's ID from the claims in the JWT token
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = HttpContext.User.FindFirst("id");
             var jwtToken = HttpContext.Request.Headers["Authorization"];
 
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
@@ -56,17 +46,52 @@ namespace ProjetNET.Controllers
                 return NotFound("User not found");
             }
 
-            var historique = _db.HistoriquePresences.Where(h => h.UserId == userId).ToList();
+
+                 var histoPresencesData = _db.HistoriquePresences
+                .Where(h => h.UserId == userId)
+                .Select(h => new 
+                {
+                    Name = h.Meeting.Name,
+                    Description = h.Meeting.Description,
+                    Date = h.Meeting.Date,
+                    Validation = h.Presence,
+                    Cause = h.Cause,
+                    EventType = "Meeting"
+
+                })
+                .ToList();
+
+            var histoTasksData = _db.ValidationTasks
+               .Where(h => h.UserId == userId)
+               .Select(h => new {
+                   Name = h.Task.Name,
+                   Description = h.Task.Description,
+                   Date=h.Task.DeadLine,
+                   Validation = h.Validation,
+                   Cause = h.Cause,
+                   EventType = "Task"
+               })
+               .ToList();
+
+
+            var combinedData = histoPresencesData
+       .Concat(histoTasksData)
+       .OrderBy(e => e.Date)
+       .ToList();
+
+
+            
 
             var profileData = new
             {
                 UserData = user,
-                HistoriqueData = historique
+                histoData= combinedData,
             };
 
             return Ok(profileData);
         }
 
+<<<<<<< HEAD
         [HttpGet("Blames")]
         public ActionResult<object> GetUserWarnings(Guid userId)
         {
@@ -109,6 +134,8 @@ namespace ProjetNET.Controllers
         }
 
         //Medal
+=======
+>>>>>>> blames
 
 
         [HttpGet("Medals")]
@@ -155,3 +182,29 @@ namespace ProjetNET.Controllers
 
     }
 }
+
+
+
+//      var combinedData = histoPresencesData
+//.Select(e => new
+//{
+//    Name = e.Name,
+//    Description = e.Description,
+//    Date = e.Date,
+//    Validation = e.Validation,
+//    Cause = e.Cause,
+//    EventType = e.EventType
+//})
+//.Concat(histoTasksData
+//    .Select(e => new
+//    {
+//        Name = e.Name,
+//        Description = e.Description,
+//        Date = e.Date,
+//        Validation = e.Validation,
+//        Cause = e.Cause,
+//        EventType = e.EventType
+//    })
+//)
+//.OrderBy(e => e.Date)
+//.ToList();
