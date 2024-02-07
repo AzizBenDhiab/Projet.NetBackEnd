@@ -23,7 +23,7 @@ namespace ProjetNET.Controllers
             _db = db;
             _config = config;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public ActionResult<User> Register(User request)
         {
@@ -51,14 +51,17 @@ namespace ProjetNET.Controllers
             }
             if (_db.Users.Any(u => u.Email == request.Email))
             {
-                return BadRequest("Email already exists");
+                return Conflict("Email already exists");
             }
+
 
             // Validate password length or other criteria if needed
             if (request.PasswordHash.Length < 6)
             {
                 return BadRequest("Password should be at least 6 characters long");
             }
+
+           
 
             // Hash the password
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
