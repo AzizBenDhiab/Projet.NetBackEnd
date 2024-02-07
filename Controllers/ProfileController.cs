@@ -12,7 +12,7 @@ namespace ProjetNET.Controllers
 {
     [Route("api/Profile")]
     [ApiController]
-   // [Authorize] 
+    [Authorize]
     public class ProfileController : ControllerBase
     {
 
@@ -23,7 +23,7 @@ namespace ProjetNET.Controllers
         }
 
 
-        
+
 
 
         [HttpGet("/Profile")]
@@ -47,26 +47,26 @@ namespace ProjetNET.Controllers
             }
 
 
-                 var histoPresencesData = _db.HistoriquePresences
-                .Where(h => h.UserId == userId)
-                .Select(h => new 
-                {
-                    Name = h.Meeting.Name,
-                    Description = h.Meeting.Description,
-                    Date = h.Meeting.Date,
-                    Validation = h.Presence,
-                    Cause = h.Cause,
-                    EventType = "Meeting"
+            var histoPresencesData = _db.HistoriquePresences
+           .Where(h => h.UserId == userId)
+           .Select(h => new
+           {
+               Name = h.Meeting.Name,
+               Description = h.Meeting.Description,
+               Date = h.Meeting.Date,
+               Validation = h.Presence,
+               Cause = h.Cause,
+               EventType = "Meeting"
 
-                })
-                .ToList();
+           })
+           .ToList();
 
             var histoTasksData = _db.ValidationTasks
                .Where(h => h.UserId == userId)
                .Select(h => new {
                    Name = h.Task.Name,
                    Description = h.Task.Description,
-                   Date=h.Task.DeadLine,
+                   Date = h.Task.DeadLine,
                    Validation = h.Validation,
                    Cause = h.Cause,
                    EventType = "Task"
@@ -80,105 +80,18 @@ namespace ProjetNET.Controllers
        .ToList();
 
 
-            
+
 
             var profileData = new
             {
                 UserData = user,
-                histoData= combinedData,
+                histoData = combinedData,
             };
 
             return Ok(profileData);
         }
 
-<<<<<<< HEAD
-        [HttpGet("Blames")]
-        public ActionResult<object> GetUserWarnings(Guid userId)
-        {
-            var userBlames = _db.Blames.Where(w => w.UserId.Equals( userId)).ToList();
-            return Ok(userBlames) ;
-        }
 
-        [HttpPost("Blames")]
-        public ActionResult<object> AddUserBlame(Guid userId, string objet, string name, string contention)
-        {
-            var newBlame = new Blame
-            {
-                UserId = userId,
-                Object = objet,
-                Name=name,
-                Contention=contention,
-           
-            };
-
-            _db.Blames.Add(newBlame);
-            _db.SaveChanges();
-
-            return Ok("blame added successfully");
-        }
-
-        [HttpDelete("Blames")]
-
-        public ActionResult<object> DeleteBlame(Guid BlameId)
-        {
-            var BlameToDelete = _db.Blames.Find(BlameId);
-
-            if (BlameToDelete != null)
-            {
-                _db.Blames.Remove(BlameToDelete);
-                _db.SaveChanges();
-            }
-
-            
-            return Ok("blame deleted successfully");
-        }
-
-        //Medal
-=======
->>>>>>> blames
-
-
-        [HttpGet("Medals")]
-        public ActionResult<object> GetUserMedals(Guid userId)
-        {
-            var userMedals = _db.Medals.Where(w => w.UserId.Equals(userId)).ToList();
-            return Ok(userMedals);
-        }
-
-        [HttpPost("Medals")]
-        public ActionResult<object> AddUserMedal(Guid userId, string type, string name, string description, DateTime date)
-        {
-            var newMedal = new Medal
-            {
-                UserId = userId,
-                Type = type,
-                Name = name,
-                Description = description,
-                Date = date
-
-            };
-
-            _db.Medals.Add(newMedal);
-            _db.SaveChanges();
-
-            return Ok("medal added successfully");
-        }
-
-        [HttpDelete("Medals")]
-
-        public ActionResult<object> DeleteMedal (Guid MedalId)
-        {
-            var MedalToDelete = _db.Medals.Find(MedalId);
-
-            if (MedalToDelete != null)
-            {
-                _db.Medals.Remove(MedalToDelete);
-                _db.SaveChanges();
-            }
-
-
-            return Ok("medal deleted successfully");
-        }
 
     }
 }
