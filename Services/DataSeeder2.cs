@@ -61,8 +61,8 @@ namespace ProjetNET.Services
                 var fakeBlames = new BlameGenerator(scopedContext).GenerateFakeBlames(20);
                 scopedContext.Blames.AddRange(fakeBlames);
 
-                var fakeAnonymBoxComment = new AnonymBoxGenerator().GenerateFakeAnonymBoxComments(10);
-                scopedContext.AnonymBoxComments.AddRange(fakeAnonymBoxComment);
+               // var fakeAnonymBoxComment = new AnonymBoxGenerator().GenerateFakeAnonymBoxComments(10);
+                //scopedContext.AnonymBoxComments.AddRange(fakeAnonymBoxComment);
 
 
 

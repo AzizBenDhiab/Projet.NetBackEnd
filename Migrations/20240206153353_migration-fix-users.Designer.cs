@@ -12,8 +12,8 @@ using ProjetNET.Controllers;
 namespace ProjetNET.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240116112159_ajoutProprieteNavig")]
-    partial class ajoutProprieteNavig
+    [Migration("20240206153353_migration-fix-users")]
+    partial class migrationfixusers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,32 @@ namespace ProjetNET.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("EquipeUser");
+                });
+
+            modelBuilder.Entity("PasswordRecovery", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RecoveryCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordRecoveries");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.AnonymBoxComment", b =>
@@ -134,6 +160,12 @@ namespace ProjetNET.Migrations
 
                     b.Property<string>("Cause")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Denied")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Presence")
                         .HasColumnType("bit");
@@ -282,6 +314,9 @@ namespace ProjetNET.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -386,6 +421,17 @@ namespace ProjetNET.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PasswordRecovery", b =>
+                {
+                    b.HasOne("ProjetNET.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjetNET.Models.Blame", b =>
                 {
                     b.HasOne("ProjetNET.Models.User", "User")
@@ -412,13 +458,15 @@ namespace ProjetNET.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjetNET.Models.User", null)
+                    b.HasOne("ProjetNET.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Meeting");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.Medal", b =>

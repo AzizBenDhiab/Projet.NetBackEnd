@@ -62,12 +62,19 @@ namespace ProjetNET.Controllers
                 return BadRequest();
 
             }
-            b.Id = Guid.NewGuid();
-
-            _db.Blames.Add(b);
+           
+            var blame = new Blame
+            {
+                Id = Guid.NewGuid(),
+                DateCreation = DateTime.Now,
+                Object = b.Object,
+                Name = b.Name,
+                UserId=b.UserId,
+            };
+            _db.Blames.Add(blame);
             _db.SaveChanges();
 
-            return Ok("blame added successfully");
+            return Ok(blame);
         }
 
         [HttpPatch("{blameId}")]

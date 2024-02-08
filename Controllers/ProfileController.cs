@@ -46,41 +46,38 @@ namespace ProjetNET.Controllers
                 return NotFound("User not found");
             }
 
+            var currentDate = DateTime.Now;
 
             var histoPresencesData = _db.HistoriquePresences
-           .Where(h => h.UserId == userId)
-           .Select(h => new
-           {
-               Name = h.Meeting.Name,
-               Description = h.Meeting.Description,
-               Date = h.Meeting.Date,
-               Validation = h.Presence,
-               Cause = h.Cause,
-               EventType = "Meeting"
-
-           })
-           .ToList();
+                .Where(h => h.UserId == userId && h.Meeting.Date < currentDate)
+                .Select(h => new
+                {
+                    Name = h.Meeting.Name,
+                    Description = h.Meeting.Description,
+                    Date = h.Meeting.Date,
+                    Validation = h.Presence,
+                    Cause = h.Cause,
+                    EventType = "Meeting"
+                })
+                .ToList();
 
             var histoTasksData = _db.ValidationTasks
-               .Where(h => h.UserId == userId)
-               .Select(h => new {
-                   Name = h.Task.Name,
-                   Description = h.Task.Description,
-                   Date = h.Task.DeadLine,
-                   Validation = h.Validation,
-                   Cause = h.Cause,
-                   EventType = "Task"
-               })
-               .ToList();
-
+                .Where(h => h.UserId == userId && h.Task.DeadLine < currentDate)
+                .Select(h => new
+                {
+                    Name = h.Task.Name,
+                    Description = h.Task.Description,
+                    Date = h.Task.DeadLine,
+                    Validation = h.Validation,
+                    Cause = h.Cause,
+                    EventType = "Task"
+                })
+                .ToList();
 
             var combinedData = histoPresencesData
-       .Concat(histoTasksData)
-       .OrderBy(e => e.Date)
-       .ToList();
-
-
-
+                .Concat(histoTasksData)
+                .OrderBy(e => e.Date)
+                .ToList();
 
             var profileData = new
             {
@@ -93,31 +90,10 @@ namespace ProjetNET.Controllers
 
 
 
+
     }
 }
 
 
 
-//      var combinedData = histoPresencesData
-//.Select(e => new
-//{
-//    Name = e.Name,
-//    Description = e.Description,
-//    Date = e.Date,
-//    Validation = e.Validation,
-//    Cause = e.Cause,
-//    EventType = e.EventType
-//})
-//.Concat(histoTasksData
-//    .Select(e => new
-//    {
-//        Name = e.Name,
-//        Description = e.Description,
-//        Date = e.Date,
-//        Validation = e.Validation,
-//        Cause = e.Cause,
-//        EventType = e.EventType
-//    })
-//)
-//.OrderBy(e => e.Date)
-//.ToList();
+

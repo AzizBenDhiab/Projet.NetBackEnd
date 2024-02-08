@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetNET.Controllers;
 
@@ -11,9 +12,11 @@ using ProjetNET.Controllers;
 namespace ProjetNET.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240126112939_Migration2")]
+    partial class Migration2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,32 +38,6 @@ namespace ProjetNET.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("EquipeUser");
-                });
-
-            modelBuilder.Entity("PasswordRecovery", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RecoveryCode")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PasswordRecoveries");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.AnonymBoxComment", b =>
@@ -88,9 +65,6 @@ namespace ProjetNET.Migrations
 
                     b.Property<string>("Contention")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -160,12 +134,6 @@ namespace ProjetNET.Migrations
 
                     b.Property<string>("Cause")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Confirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Denied")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("Presence")
                         .HasColumnType("bit");
@@ -314,9 +282,6 @@ namespace ProjetNET.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -421,17 +386,6 @@ namespace ProjetNET.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PasswordRecovery", b =>
-                {
-                    b.HasOne("ProjetNET.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ProjetNET.Models.Blame", b =>
                 {
                     b.HasOne("ProjetNET.Models.User", "User")
@@ -452,21 +406,17 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.HistoriquePresence", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Meeting", "Meeting")
+                    b.HasOne("ProjetNET.Models.Meeting", null)
                         .WithMany()
                         .HasForeignKey("MeetingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjetNET.Models.User", "User")
+                    b.HasOne("ProjetNET.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Meeting");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjetNET.Models.Medal", b =>
@@ -489,7 +439,7 @@ namespace ProjetNET.Migrations
 
             modelBuilder.Entity("ProjetNET.Models.ValidationTask", b =>
                 {
-                    b.HasOne("ProjetNET.Models.Task", "Task")
+                    b.HasOne("ProjetNET.Models.Task", null)
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -500,8 +450,6 @@ namespace ProjetNET.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("ProjetUser", b =>

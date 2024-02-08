@@ -9,6 +9,7 @@ namespace ProjetNET.Models
         public string? Object { get; set; }
         public string? Name { get; set; }
         public string? Contention { get; set; }
+        public DateTime? DateCreation { get; set; }
 
         [ForeignKey(nameof(User))]
         public Guid? UserId { get; set; }

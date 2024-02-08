@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ProjetNET.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,7 @@ namespace ProjetNET.Controllers
             _db = db;
             _config = config;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public ActionResult<User> Register(User request)
         {
@@ -51,14 +51,17 @@ namespace ProjetNET.Controllers
             }
             if (_db.Users.Any(u => u.Email == request.Email))
             {
-                return BadRequest("Email already exists");
+                return Conflict("Email already exists");
             }
+
 
             // Validate password length or other criteria if needed
             if (request.PasswordHash.Length < 6)
             {
                 return BadRequest("Password should be at least 6 characters long");
             }
+
+           
 
             // Hash the password
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
@@ -100,7 +103,7 @@ namespace ProjetNET.Controllers
             }
 
             // Find the user by email
-            var user = _db.Users.FirstOrDefault(u => u.Email == loginRequest.Email);
+            var user = _db.Users.FirstOrDefault(u => u.Email == loginRequest.Email && u.DeletedAt==null );
              
             // Check if the user exists and verify the password
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
@@ -135,7 +138,7 @@ namespace ProjetNET.Controllers
                 return BadRequest();
             }
 
-            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            var e = _db.Users.FirstOrDefault(u => u.Id == id && u.DeletedAt == null);
 
             if (e == null)
             {
@@ -154,14 +157,14 @@ namespace ProjetNET.Controllers
         {
 
 
-            var e = _db.Users.ToList();
+            var users = _db.Users.Where(u => u.DeletedAt == null).ToList();
 
-            if (e == null)
+            if (users == null)
             {
                 return NotFound();
             }
 
-            return Ok(e);
+            return Ok(users);
         }
 
 
@@ -177,15 +180,61 @@ namespace ProjetNET.Controllers
             {
                 return BadRequest();
             }
-            var e = _db.Users.FirstOrDefault(u => u.Id == id);
+            var e = _db.Users.FirstOrDefault(u => u.Id == id && u.DeletedAt==null);
             if (e == null)
             {
                 return NotFound();
             }
-            _db.Users.Remove(e);
+            e.DeletedAt = DateTime.Now; 
+          
             _db.SaveChanges();
             return NoContent();
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("isloggedin")]
+        public IActionResult IsLoggedIn()
+        {
+            return Ok("You are logged in");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("isadmin")]
+        public IActionResult IsAdmin()
+        {
+            return Ok("You are an admin");
+        }
+
+
+        [HttpDelete("deletemembers")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteMembers([FromBody] List<Guid> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return BadRequest("No user IDs provided for deletion");
+            }
+
+            var usersToDelete = _db.Users.Where(u => ids.Contains(u.Id) && u.DeletedAt == null).ToList();
+            if (usersToDelete.Count == 0)
+            {
+                return NotFound("No users found with the provided IDs");
+            }
+            var currentTime = DateTime.Now;
+            foreach (var user in usersToDelete)
+            {
+                user.DeletedAt = currentTime;
+            }
+
+            
+
+            _db.SaveChanges();
+
+            return NoContent();
+        }
+
 
         // Validate email format
         [NonAction]
@@ -202,8 +251,6 @@ namespace ProjetNET.Controllers
             }
         }
         [NonAction]
-
-
         public string GenerateTokenString(User user,bool RememberMe)
 
         {
@@ -219,6 +266,7 @@ namespace ProjetNET.Controllers
 
             var securityToken = new JwtSecurityToken(
             claims: claims,
+
                 expires: RememberMe ? DateTime.UtcNow.AddMonths(12) : DateTime.UtcNow.AddHours(1),
                 signingCredentials: signingCred);
 
@@ -226,8 +274,11 @@ namespace ProjetNET.Controllers
             return tokenString;
         }
     }
-   
-    
+
+
+
+
+
 
     public class LoginRequest
     {
