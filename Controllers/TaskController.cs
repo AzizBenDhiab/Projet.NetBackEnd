@@ -16,7 +16,7 @@ namespace ProjetNET.Controllers
         }
         
         [HttpPost("create")]
-        public IActionResult Create([FromBody] TaskForm taskform) {
+        public IActionResult Create([FromBody] Models.Task taskform) {
             if (taskform==null)
             {
                 return BadRequest("form vide");
