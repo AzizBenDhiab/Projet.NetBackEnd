@@ -5,24 +5,24 @@
 namespace ProjetNET.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreationDateColumn : Migration
+    public partial class DropCreationDateColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "CreationDate",
-                table: "Blames",
-                nullable: true,
-                defaultValueSql: "GETDATE()");
+            migrationBuilder.DropColumn(
+     name: "CreationDate",
+     table: "Blames");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "CreationDate",
-                table: "Blames");
+            migrationBuilder.AddColumn<DateTime>(
+        name: "CreationDate",
+        table: "Blames",
+        nullable: true,
+        defaultValueSql: "GETDATE()");
         }
     }
 }

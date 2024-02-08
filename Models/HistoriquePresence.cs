@@ -19,6 +19,6 @@ namespace ProjetNET.Models
         public String? Cause { get; set; }
         public User User { get; internal set; }
 
-        public Meeting Meeting { get; set; }
+        
     }
 }

@@ -51,7 +51,7 @@ namespace ProjetNET.Controllers
                 .HasForeignKey(e => e.ParentEquipeId)
                 .IsRequired(false);
 
-
+       
 
 
 

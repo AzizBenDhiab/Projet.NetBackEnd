@@ -54,7 +54,7 @@ namespace ProjetNET.Controllers
         }
 
         [HttpPost]
-       [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<object> AddUserBlame([FromBody] Blame b)
         {
             if (b == null)
@@ -66,7 +66,7 @@ namespace ProjetNET.Controllers
             var blame = new Blame
             {
                 Id = Guid.NewGuid(),
-                CreationDate = DateTime.Now,
+                DateCreation = DateTime.Now,
                 Object = b.Object,
                 Name = b.Name,
                 UserId=b.UserId,

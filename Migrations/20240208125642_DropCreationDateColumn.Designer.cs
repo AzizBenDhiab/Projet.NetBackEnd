@@ -12,8 +12,8 @@ using ProjetNET.Controllers;
 namespace ProjetNET.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240208100612_AddCreationDateColumn")]
-    partial class AddCreationDateColumn
+    [Migration("20240208125642_DropCreationDateColumn")]
+    partial class DropCreationDateColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,6 +91,9 @@ namespace ProjetNET.Migrations
 
                     b.Property<string>("Contention")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
