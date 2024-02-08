@@ -41,10 +41,11 @@ namespace ProjetNET.Services
             return tasks;
         }
 
-        public void CreateTask(TaskForm taskForm)
+        public void CreateTask(Models.Task taskForm)
         {
             Models.Task task = new Models.Task()
             {
+                Id = Guid.NewGuid(),
                 DeadLine = taskForm.DeadLine,
                 Description = taskForm.Description,
                 Name = taskForm.Name,
@@ -55,13 +56,13 @@ namespace ProjetNET.Services
             _db.SaveChanges();
             foreach (var userId in taskForm.Users)
             {
-                 var user = _db.Users.FirstOrDefault(c=>c.Id==userId);
+                 var user = _db.Users.FirstOrDefault(c=>c.Id==userId.Id);
                 if (user!=null)
                 {
                     var taskValidation = new Models.ValidationTask()
                     {
                         TaskId = task.Id,
-                        UserId = userId,
+                        UserId = userId.Id,
                         Validation = false,
                     };
                     _db.ValidationTasks.Add(taskValidation);

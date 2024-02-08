@@ -125,7 +125,7 @@ namespace ProjetNET.Controllers
             }
             var meetingAttr = new Meeting
             {
-                Date = DateTime.Now,
+                Date = meeting.Date,
                 Description = meeting.Description,
                 Type = meeting.Type,
                 Name = meeting.Name,
