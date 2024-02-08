@@ -55,22 +55,23 @@ namespace ProjetNET.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult<object> AddUserMedal([FromBody] Medal b)
+        public ActionResult<object> AddUserMedal([FromBody] Medal m)
         {
-            if (b == null)
+            if (m == null)
             {
                 return BadRequest();
 
             }
-            b.Id = Guid.NewGuid();
-
-            _db.Medals.Add(b);
+            m.Id = Guid.NewGuid();
+            m.Date = DateTime.Now;
+            
+            _db.Medals.Add(m);
             _db.SaveChanges();
 
-            return Ok("blame added successfully");
+            return Ok("medal added successfully");
         }
 
-        [HttpPatch("{blameId}")]
+        [HttpPatch("{medalId}")]
         public IActionResult AddContest(Guid medalId, [FromBody] JsonPatchDocument<Medal> patch)
         {
             if ((medalId == Guid.Empty) || (patch == null))
