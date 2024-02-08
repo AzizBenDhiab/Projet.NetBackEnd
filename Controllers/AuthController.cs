@@ -191,6 +191,21 @@ namespace ProjetNET.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("isloggedin")]
+        public IActionResult IsLoggedIn()
+        {
+            return Ok("You are logged in");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("isadmin")]
+        public IActionResult IsAdmin()
+        {
+            return Ok("You are an admin");
+        }
+
+
         [HttpDelete("deletemembers")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
