@@ -21,8 +21,8 @@ namespace ProjetNET.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-    name: "CreationDate",
-    table: "Blames");
+                name: "CreationDate",
+                table: "Blames");
         }
     }
 }

@@ -7,6 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
 using Bogus.DataSets;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ProjetNET.Controllers
 {
@@ -52,7 +54,7 @@ namespace ProjetNET.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+       [Authorize(Roles = "Admin")]
         public ActionResult<object> AddUserBlame([FromBody] Blame b)
         {
             if (b == null)
@@ -60,24 +62,45 @@ namespace ProjetNET.Controllers
                 return BadRequest();
 
             }
-            b.Id = Guid.NewGuid();
-
-            _db.Blames.Add(b);
+           
+            var blame = new Blame
+            {
+                Id = Guid.NewGuid(),
+                CreationDate = DateTime.Now,
+                Object = b.Object,
+                Name = b.Name,
+                UserId=b.UserId,
+            };
+            _db.Blames.Add(blame);
             _db.SaveChanges();
 
-            return Ok("blame added successfully");
+            return Ok(blame);
         }
 
         [HttpPatch("{blameId}")]
-        [Authorize(Roles = "User")]
-        public ActionResult<object> AddContest(Guid blameId,[FromBody] string? contestation)
+        public IActionResult AddContest(Guid blameId, [FromBody] JsonPatchDocument<Blame> patch)
         {
-            var blame = _db.Blames.Where(w => w.Id.Equals(blameId)).FirstOrDefault();
-            if (blame == null) { return NotFound(); }
-            blame.Contention = contestation;
+            if ((blameId == Guid.Empty) || (patch == null))
+            {
+                return BadRequest();
+            }
+            var entity = _db.Blames.FirstOrDefault(u => u.Id == blameId); ;
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            patch.ApplyTo(entity, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             _db.SaveChanges();
 
-            return Ok("contention added successfully");
+            return NoContent();
         }
 
 
