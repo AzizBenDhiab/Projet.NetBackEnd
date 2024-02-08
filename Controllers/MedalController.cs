@@ -63,7 +63,7 @@ namespace ProjetNET.Controllers
 
             }
             b.Id = Guid.NewGuid();
-
+            b.Date = DateTime.Now;
             _db.Medals.Add(b);
             _db.SaveChanges();
 
