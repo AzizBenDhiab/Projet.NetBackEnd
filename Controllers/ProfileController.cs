@@ -12,7 +12,7 @@ namespace ProjetNET.Controllers
 {
     [Route("api/Profile")]
     [ApiController]
-    [Authorize] 
+    [Authorize]
     public class ProfileController : ControllerBase
     {
 
