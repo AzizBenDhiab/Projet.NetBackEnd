@@ -6,10 +6,10 @@ namespace ProjetNET.Models
 {
     public class HistoriquePresence
     {
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(Models.User))]
         public Guid UserId { get; set; }
 
-        [ForeignKey(nameof(Meeting))]
+        [ForeignKey(nameof(Models.Meeting))]
         public Guid MeetingId { get; set; }
 
         public Meeting Meeting { get; set; }    
