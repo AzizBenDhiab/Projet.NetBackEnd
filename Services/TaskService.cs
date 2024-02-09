@@ -45,7 +45,6 @@ namespace ProjetNET.Services
         {
             Models.Task task = new Models.Task()
             {
-                Id = Guid.NewGuid(),
                 DeadLine = taskForm.DeadLine,
                 Description = taskForm.Description,
                 Name = taskForm.Name,

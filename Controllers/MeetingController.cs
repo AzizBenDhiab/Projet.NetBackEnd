@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ProjetNET.Controllers
 {
@@ -134,22 +135,34 @@ namespace ProjetNET.Controllers
 
             // Add the meeting to the context
             _context.Meetings.Add(meetingAttr);
-           //
-           // _context.SaveChanges();
+            //
+            // _context.SaveChanges();
 
             // Create HistoriquePresence instances for each user related to the meeting
-            foreach (var user in meeting.Users)
+            foreach (var userId in meeting.Users)
             {
-                var historiquePresence = new HistoriquePresence
+                var user = _context.Users.FirstOrDefault(c => c.Id == userId.Id);
+
+                if (user != null)
                 {
-                    UserId = user.Id,
-                    MeetingId = meetingAttr.Id,
-                    Presence = false // Set to false by default
+                    // Check if a ValidationTask with the same UserId and TaskId exists
+                    var existingHistoriquePresence = _context.HistoriquePresences.FirstOrDefault(vt => vt.UserId == userId.Id && vt.MeetingId == meeting.Id);
 
-                };
+                    // If the ValidationTask doesn't already exist, create a new one
+                    if (existingHistoriquePresence == null)
+                    {
+                        var historiquePresence = new HistoriquePresence
+                        {
+                            UserId = user.Id,
+                            MeetingId = meetingAttr.Id,
+                            Presence = false // Set to false by default
 
-                // Add the HistoriquePresence instance to the context
-                _context.HistoriquePresences.Add(historiquePresence);
+                        };
+
+                        // Add the HistoriquePresence instance to the context
+                        _context.HistoriquePresences.Add(historiquePresence);
+                    }
+                }
             }
 
             // Save changes to the database
