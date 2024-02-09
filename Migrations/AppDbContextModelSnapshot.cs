@@ -89,8 +89,8 @@ namespace ProjetNET.Migrations
                     b.Property<string>("Contention")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("DateCreation")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
