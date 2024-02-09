@@ -33,8 +33,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddHostedService<DataSeeder>();
-//builder.Services.AddHostedService<DataSeeder2>();
+builder.Services.AddHostedService<DataSeeder>();
+builder.Services.AddHostedService<DataSeeder2>();
 builder.Services.AddScoped<AnonymBoxCommentService>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<ValidationTaskService>();

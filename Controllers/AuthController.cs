@@ -191,7 +191,7 @@ namespace ProjetNET.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("isloggedin")]
         public IActionResult IsLoggedIn()
         {
