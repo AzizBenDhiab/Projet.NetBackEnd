@@ -9,10 +9,9 @@ namespace ProjetNET.Models
         [ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
 
-        [ForeignKey(nameof(Meeting))]
+        [ForeignKey(nameof(Models.Meeting))]
         public Guid MeetingId { get; set; }
 
-        public Meeting Meeting { get; set; }    
         public bool Presence {  get; set; }
         public bool Confirmed { get; set; }
         public bool Denied { get; set; }
